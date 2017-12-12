@@ -30,6 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
+    //TODO: general problems: if something is not setup (config, db, dash-cli, etc.), it just crashes with NullReferenceException or things stay null and are not working!
+    //TODO: tons of global variables, very unclean code
     public static final String OK_HAND = "👌", PONG = "🏓";
     public static final String PREFIX = "~";
     private static final String BOT_MENTION;
@@ -45,13 +47,14 @@ public class Main {
         thread.setDaemon(true);
         return thread;
     });
+    //TODO: Why is this in the static constructor? Crashes here crash the whole runtime
     static {
         try {
             Config.setUp();
             DISCORD_CLIENT = new ClientBuilder().withToken(Config.TOKEN).login();
             DISCORD_CLIENT.getDispatcher().registerListener(Main.class);
             DISCORD_CLIENT.getDispatcher().waitFor(ReadyEvent.class);
-            MAINTAINER = DISCORD_CLIENT.getUserByID(191677220027236352L);
+            MAINTAINER = DISCORD_CLIENT.getUserByID(302494387366264832L);//TODO: would be better in config //Jack: 191677220027236352L, DeltaEngine: 302494387366264832L
             BOT_MENTION = DISCORD_CLIENT.getOurUser().mention();
             new Reflections("com.github.nija123098.tipbot.commands").getSubTypesOf(AbstractCommand.class).stream().map((clazz) -> {
                 try{return clazz.newInstance();
@@ -75,6 +78,7 @@ public class Main {
         String content = event.getMessage().getContent();
         if (content.startsWith(PREFIX)) content = content.substring(PREFIX.length());
         else if (content.startsWith(BOT_MENTION)) content = content.substring(BOT_MENTION.length());
+        //TODO: why this restriction? can we only talk privately to bot via pm? why not in channel? also no error message?
         else if (!event.getChannel().isPrivate()) return;
         if (!PermissionUtils.hasPermissions(event.getChannel(), DISCORD_CLIENT.getOurUser(), Permissions.SEND_MESSAGES, Permissions.READ_MESSAGES)) return;
         if (!PermissionUtils.hasPermissions(event.getChannel(), DISCORD_CLIENT.getOurUser(), Permissions.ADD_REACTIONS)) {
@@ -94,6 +98,7 @@ public class Main {
             if (command == null || SHUTTING_DOWN.get()) return;
             COMMANDS_OCCURRING.incrementAndGet();
         }
+        //TODO: if anything goes wrong here, user is not informed and won't know why a command failed
         try {
             String ret = command.invoke(event.getAuthor(), Arrays.copyOfRange(split, 1, split.length), event.getChannel());
             if (ret == null || ret.isEmpty()) return;
@@ -130,6 +135,7 @@ public class Main {
 
     private static void issueReport(MessageEvent event, Exception e){
         RequestBuffer.request(() -> event.getAuthor().getOrCreatePMChannel().sendMessage("Something went wrong while executing your command, I am notifying my maintainer now."));
+        //TODO: all this funny language is not very helpful
         RequestBuffer.request(() -> MAINTAINER.getOrCreatePMChannel().sendMessage("You moron, I just caught a " + e.getClass().getSimpleName() + " due to " + e.getMessage()));
         e.printStackTrace();
     }

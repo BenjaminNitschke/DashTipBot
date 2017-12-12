@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.nija123098</groupId>
-    <artifactId>DashBot</artifactId>
+    <artifactId>DashTipBot</artifactId><!--TODO: should be DashTipBot like everywhere else -->
     <version>1.0-SNAPSHOT</version>
 
     <properties>

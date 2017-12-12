@@ -18,7 +18,9 @@ public class Config {
         Map<String, String> map = Files.readAllLines(Paths.get("config.cfg")).stream().collect(Collectors.toMap((string) -> string.substring(0, string.indexOf("=")), (string) -> string.substring(string.indexOf("=") + 1, string.length())));
         Stream.of(Config.class.getFields()).forEach((field -> {
             try {
-                field.set(null, map.get(field.getName().toLowerCase()));
+                String value = map.get(field.getName().toLowerCase());
+                //TODO: should be trimmed, any space in the config and things don't work well anymore
+                field.set(null, value);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

@@ -25,6 +25,7 @@ public class Database {
     private static final QueryRunner RUNNER;
     static {
         try {
+            //TODO: This is called several times
             Config.setUp();
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,9 +56,11 @@ public class Database {
     }
 
     // DB stuff
+    //TODO: messy way of doing sql, better would be to use ParameterizedQuery
     private static <E> E select(String sql, ResultSetHandler<E> handler) {
         try{return RUNNER.query(sql, handler);
         } catch (SQLException e) {
+            //TODO: all this is a very bad way of error handling
             throw new RuntimeException("Could not select: ERROR: " + e.getErrorCode() + " " + sql, e);
         }
     }
