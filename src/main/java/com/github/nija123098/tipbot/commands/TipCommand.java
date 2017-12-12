@@ -20,6 +20,7 @@ import java.util.*;
 import static com.github.nija123098.tipbot.Database.BALANCES_TABLE;
 
 public class TipCommand extends AbstractCommand {
+    //TODO: just makes it confusing, all this bot should support is !tip !deposit !balance and !withdrawal
     @Override
     public List<String> getNames() {
         return Arrays.asList("tip", "give", "gift", "donate", "grant");
@@ -41,6 +42,7 @@ public class TipCommand extends AbstractCommand {
                 "    " + Main.PREFIX + "tip " + Main.MAINTAINER.mention() + " .01 Dash";
     }
 
+    //TODO: Code issue: The method getCommand() has an NPath complexity of 2160
     @Override
     public Command getCommand() {
         return ((invoker, arguments, channel) -> {
@@ -48,11 +50,16 @@ public class TipCommand extends AbstractCommand {
             List<IUser> recipients = new ArrayList<>();
             IUser user;
             for (String argument : arguments) {
-                user = Main.getUserFromMention(argument);
+                //TODO: no idea how the user should figure this out, only works if <@username> is used, not simple mention and not @username (default in discord)
+                //TODO: also wasteful to check all arguments, this should be a regex
+                user = Main.getUserFromMention(argument);//TODO: only format that works is <@id>
+                //TODO: why break the loop? couldn't the user be mentioned later?
+                //TODO: Code issue: Avoid using a branching statement as the last in a loop.
                 if (user == null) break;
                 recipients.add(user);
             }
             for (IUser recipient : recipients){
+                //TODO: doesn't work, our user is the user id, not the name typed in chat
                 if (recipient.equals(invoker)) return "You can't tip yourself.";
                 if (recipient.isBot()) return "You can't tip a bot";
             }
@@ -84,6 +91,7 @@ public class TipCommand extends AbstractCommand {
             return Main.OK_HAND;
         });
     }
+    //TODO: Code issue: Fields should be declared at the top of the class, before any method declarations, constructors, initializers or inner classes.
     private static final Map<Long, Double> TIP_AMOUNT = new HashMap<>();
     private static final Map<Long, IMessage> TALLY_MESSAGE = new HashMap<>();
     public static void handleReaction(ReactionAddEvent event) throws IOException, InterruptedException {
@@ -119,8 +127,10 @@ public class TipCommand extends AbstractCommand {
         }
         return null;
     }
+    //TODO: would be better if all this is done in a public channel, not special some announcement channel
     private static void tipAnnounce(IUser invoker, IUser recipient, IGuild guild, double amount, Unit unit){
         String channel = Database.getValue(Database.ANNOUNCEMENT_CHANNEL, guild, "NULL");
+        //TODO: code issue: Position literals first in String comparisons
         if (channel.equals("NULL")) return;
         IChannel dest = guild.getChannelByID(Long.parseLong(channel));
         if (dest != null) dest.sendMessage(invoker.mention() + " tipped " + recipient.mention() + " " + unit.display(amount));

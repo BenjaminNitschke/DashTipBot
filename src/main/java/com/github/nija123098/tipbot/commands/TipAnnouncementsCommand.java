@@ -6,6 +6,7 @@ import com.github.nija123098.tipbot.Database;
 import com.github.nija123098.tipbot.Main;
 
 public class TipAnnouncementsCommand extends AbstractCommand {
+    //TODO: also not needed
     @Override
     public String getHelp() {
         return null;

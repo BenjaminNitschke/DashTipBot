@@ -16,10 +16,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Database {
+    //TODO: this should not be in a database, only the blockchain contains the truth, the dash client is all we need to query this!
     public static final String BALANCES_TABLE = "balances";
+    //TODO: again, this is only needed for non registered users, otherwise we could send tips directly, this is just cumbersome
     public static final String RECEIVED_TABLE = "received";
+    //TODO: not using db properly (user should have this as a property)
     public static final String RECEIVING_ADDRESSES_TABLE = "receiving_addresses";
+    //TODO: unnecessary imo
     public static final String PREFERRED_CURRENCY = "preferred_currency";
+    //TODO: not sure why this has to be in a tip bot
     public static final String ANNOUNCEMENT_CHANNEL = "announcement_channel";
     private static final Connection CONNECTION;
     private static final QueryRunner RUNNER;
@@ -42,6 +47,7 @@ public class Database {
             dataSource.setUseUnicode(true);
             c = dataSource.getConnection();
         } catch (SQLException e) {
+            //TODO: Code issue: Avoid throwing raw exception types.
             throw new RuntimeException("Could not init database connection!", e);
         }
         CONNECTION = c;
@@ -61,6 +67,7 @@ public class Database {
         try{return RUNNER.query(sql, handler);
         } catch (SQLException e) {
             //TODO: all this is a very bad way of error handling
+            //TODO: Code issue: Avoid throwing raw exception types.
             throw new RuntimeException("Could not select: ERROR: " + e.getErrorCode() + " " + sql, e);
         }
     }
@@ -68,6 +75,7 @@ public class Database {
     private static void query(String sql) {
         try{RUNNER.update(sql);
         } catch (SQLException e) {
+            //TODO: Code issue: Avoid throwing raw exception types.
             throw new RuntimeException("Could not query: ERROR: " + e.getErrorCode() + " " + sql, e);
         }
     }
@@ -75,6 +83,7 @@ public class Database {
     private static void insert(String sql) {// set
         try{RUNNER.update(sql);
         } catch (SQLException e) {
+            //TODO: Code issue: Avoid throwing raw exception types.
             throw new RuntimeException("Could not insert: ERROR: " + e.getErrorCode() + " " + sql, e);
         }
     }
@@ -83,7 +92,9 @@ public class Database {
         return Character.isDigit(id.charAt(0)) ? id : "'" + id + "'";
     }
 
+    //TODO: Code issue: Fields should be declared at the top of the class, before any method declarations, constructors, initializers or inner classes.
     private static final Set<String> EXISTING_TABLES = new HashSet<>();
+    //TODO: each db table is just a key value pair, using mysql for that is kinda wasteful and not really necessary
     private static void ensureTableExistence(String table){
         if (!EXISTING_TABLES.add(table)) return;
         try (ResultSet rs = CONNECTION.getMetaData().getTables(null, null, table, null)) {
@@ -93,6 +104,7 @@ public class Database {
             }// make
             Database.query("CREATE TABLE `" + table + "` (id TINYTEXT, value TINYTEXT)");
         } catch (SQLException e) {
+            //TODO: Code issue: Avoid throwing raw exception types.
             throw new RuntimeException("Could not ensure table existence", e);
         }
     }
@@ -107,6 +119,7 @@ public class Database {
             } catch (SQLException e) {
                 Database.insert("INSERT INTO " + table + " (`id`, `value`) VALUES ('" + user.getStringID() + "','" + value + "');");
             }
+            //TODO: bad way of error handling!
             return null;
         });
     }
@@ -116,12 +129,14 @@ public class Database {
         Database.query("DELETE FROM " + table + " WHERE id = " + quote(object.getStringID()));
     }
 
+    //TODO: what is with the typo defaul?
     public static String getValue(String table, IDiscordObject user, String defaul){
         ensureTableExistence(table);
         return Database.select("SELECT * FROM " + table + " WHERE id = " + Database.quote(user.getStringID()), set -> {
             try{set.next();
                 return set.getString(2);
             } catch (SQLException e) {
+                //TODO: bad way of error handling, why is this here?
                 if (!e.getMessage().equals("Current position is after the last row")) throw new RuntimeException("Error while getting value", e);
                 return defaul;
             }

@@ -3,8 +3,10 @@ package com.github.nija123098.tipbot.commands;
 import com.github.nija123098.tipbot.AbstractCommand;
 import com.github.nija123098.tipbot.Command;
 import com.github.nija123098.tipbot.Database;
+import com.github.nija123098.tipbot.utility.Config;
 import com.github.nija123098.tipbot.utility.TransactionLog;
 
+//TODO: unused import
 import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,8 +45,9 @@ public class WithdrawCommand extends AbstractCommand {
             return ret;
         };
     }
+    //TODO: kinda important code, no error checking, reading dash-cli output and sending it back? not very good
     private static String sendMoney(String address, Double amount, String userID) throws IOException, InterruptedException {
-        Process process = new ProcessBuilder("dash-cli", "sendtoaddress", "\"" + address + "\"", String.valueOf(amount), "\"Standard Withdraw\"", "\"" + userID + "\"", "true").start();
+        Process process = new ProcessBuilder("dash-cli", "-rpcuser="+Config.RPC_USER, "-rpcpassword="+ Config.RPC_PASS, "sendtoaddress", "\"" + address + "\"", String.valueOf(amount), "\"Standard Withdraw\"", "\"" + userID + "\"", "true").start();
         BufferedReader inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         process.waitFor();

@@ -12,6 +12,7 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.Reactio
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
+//TODO: unused import
 import sx.blah.discord.util.Image;
 import sx.blah.discord.util.PermissionUtils;
 import sx.blah.discord.util.RequestBuffer;
@@ -30,6 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
+    //TODO: before we start: this code is super hard to test, debugging is the only option after reading errors in the log
+    //TODO: also setup and first user experience is not very thought out, many strange quirks users won't understand at first (e.g. how to mention a user for a tip seems broken)
     //TODO: general problems: if something is not setup (config, db, dash-cli, etc.), it just crashes with NullReferenceException or things stay null and are not working!
     //TODO: tons of global variables, very unclean code
     public static final String OK_HAND = "👌", PONG = "🏓";
@@ -68,10 +71,15 @@ public class Main {
                 FULL_HELP_MAP.put(name, command.getFullHelp());
             }));
         } catch (Exception e){
+            //TODO: Code issue: Avoid throwing raw exception types.
             throw new RuntimeException(e);
         }
     }
+
+    //TODO: Code issue: Document empty method body
     public static void main(String[] args) {}
+
+    //TODO: code issue: The method handle() has an NPath complexity of 5760
     @EventSubscriber
     public static void handle(MessageReceivedEvent event){
         if (event.getAuthor().isBot()) return;
@@ -85,6 +93,7 @@ public class Main {
             RequestBuffer.request(() -> event.getChannel().sendMessage("I need to be able to send reactions in this channel in order to operate."));
             return;
         }
+        //TODO: code issue: Use one line for each declaration, it enhances code readability.
         int length, newLength;
         do {
             length = content.length();
@@ -105,6 +114,7 @@ public class Main {
             if (ret.equals(OK_HAND) || ret.equals(PONG)) RequestBuffer.request(() -> event.getMessage().addReaction(ReactionEmoji.of(ret)));
             else RequestBuffer.request(() -> event.getChannel().sendMessage(ret));
         } catch (Exception e){
+            //TODO: code issue: An instanceof check is being performed on the caught exception. Create a separate catch clause for this exception type.
             if (e instanceof InputException) event.getChannel().sendMessage(e.getMessage());
             else issueReport(event, e instanceof WrappingException ? (Exception) e.getCause() : e);
         }
@@ -125,8 +135,10 @@ public class Main {
 
     public static IUser getUserFromMention(String mention){
         if (!(mention.startsWith("<@") && mention.endsWith(">"))) return null;
+        //TODO: Code issue: Avoid reassigning parameters such as 'mention'
         mention = mention.replace("!", "");
         try {
+            //TODO: only works for users on server I guess, pretty bad way to find user, parsing id, back to IUser object, why?
             return DISCORD_CLIENT.getUserByID(Long.parseLong(mention.substring(2, mention.length() - 1)));
         } catch (NumberFormatException e){
             throw new InputException("Please mention the user.");
@@ -135,8 +147,8 @@ public class Main {
 
     private static void issueReport(MessageEvent event, Exception e){
         RequestBuffer.request(() -> event.getAuthor().getOrCreatePMChannel().sendMessage("Something went wrong while executing your command, I am notifying my maintainer now."));
-        //TODO: all this funny language is not very helpful
-        RequestBuffer.request(() -> MAINTAINER.getOrCreatePMChannel().sendMessage("You moron, I just caught a " + e.getClass().getSimpleName() + " due to " + e.getMessage()));
+        //TODO: all this funny language is not very helpful: You moron, I just caught ..
+        RequestBuffer.request(() -> MAINTAINER.getOrCreatePMChannel().sendMessage("Caught a " + e.getClass().getSimpleName() + " due to " + e.getMessage()));
         e.printStackTrace();
     }
 }

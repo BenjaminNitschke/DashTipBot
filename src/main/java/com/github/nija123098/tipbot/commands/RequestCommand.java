@@ -5,6 +5,7 @@ import com.github.nija123098.tipbot.Command;
 import com.github.nija123098.tipbot.Main;
 
 public class RequestCommand extends AbstractCommand {
+    //TODO: not needed for the tip bot!
     @Override
     public String getHelp() {
         return "Sends a request to the maintainer.";

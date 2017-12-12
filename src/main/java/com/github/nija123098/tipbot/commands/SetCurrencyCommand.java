@@ -7,6 +7,7 @@ import com.github.nija123098.tipbot.Main;
 import com.github.nija123098.tipbot.utility.Unit;
 
 public class SetCurrencyCommand extends AbstractCommand {
+    //TODO: I would keep it all in dash, display values in usd like everywhere else in crypto
     @Override
     public String getHelp() {
         return "Sets the currency to print value for.";

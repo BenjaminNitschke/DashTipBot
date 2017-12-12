@@ -13,6 +13,7 @@ public class TransactionLog {
         PATH = Paths.get("Transaction-Log-" + System.currentTimeMillis());
     }
     public static void log(String log) throws IOException {
+        //TODO: don't get why this is dumped into a file when we are using db elsewhere
         Files.write(PATH, Collections.singletonList(log), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
     }
 }

@@ -11,6 +11,7 @@ public class LogoutCommand extends AbstractCommand {
         return "Shuts down the bot";
     }
 
+    //TODO: not sure why this is needed, the maintainer has full control over the bot anyway
     @Override
     public Command getCommand() {
         return (invoker, arguments, channel) -> {

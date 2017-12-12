@@ -54,6 +54,7 @@ public enum Unit {
         this.names.add(this.name());
         Collections.addAll(this.names, names);
     }
+    //TODO: code issue: Fields should be declared at the top of the class, before any method declarations, constructors, initializers or inner classes.
     private ToDashAmount dashAmount;
     private Function<Double, String> display;
     private List<String> names = new ArrayList<>(1);
@@ -74,8 +75,11 @@ public enum Unit {
     }
     private static float getDashValue(String currency) {
         try {
+            //TODO: coinmarketcap is probably better or multiple services should be checked here for fallback
+            //TODO: calling this every single time without any caching is not such a good idea, once more people use it, api limits will be reached and the price is not going to change that much every second
             return Float.parseFloat(String.valueOf(new JsonParser().parse(Unirest.get("https://min-api.cryptocompare.com/data/price?fsym=DASH&tsyms=" + currency).asString().getBody()).getAsJsonObject().get(currency)));
         } catch (UnirestException e){
+            //TODO: crashing here is not helpful as the whole command will fail just because the usd amount can't be displayed
             throw new WrappingException(e);
         }
     }
@@ -93,8 +97,10 @@ public enum Unit {
     public static Unit getUnitForName(String name){
         return NAME_MAP.get(name);
     }
+    //TODO: should use BigDecimal
     public static String displayAmount(double amount, int decimals){
         String s = String.valueOf(amount);
+        //TODO: code issue: Use one line for each declaration, it enhances code readability.
         int index = s.indexOf("."), targetLength = index + decimals;
         if (decimals < 1) return s.substring(0, index);
         StringBuilder builder = new StringBuilder(s.substring(0, Math.min(s.length(), targetLength + 1)));
