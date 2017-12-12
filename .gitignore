@@ -5,3 +5,5 @@
 *.cfg
 dependency-reduced-pom.xml
 *.txt
+Transaction-Log*
+.settings
